@@ -1,8 +1,9 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable } from 'typeorm';
+import { Case } from 'src/case/entity/case.entity';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, OneToMany } from 'typeorm';
 
 export enum UserRole {
-    RESPONDENT = 'RESPONDENT',
-    APPELLANT = 'APPELLANT',
+    USER = 'USER',
+    ADMIN = 'ADMIN',
     JUDGE = 'JUDGE',
     LITIGATOR = 'LITIGATOR',
 }
@@ -31,37 +32,11 @@ export class User {
     gender: string;
 
     @Column()
-    age: number;
+    age: string;
 
     @Column({ type: 'enum', enum: UserRole })
     role: UserRole;
 
-    @ManyToMany(() => Case, (caseEntity) => caseEntity.users)
-    @JoinTable({
-        name: 'user_case',
-        joinColumn: {
-            name: 'user_id',
-            referencedColumnName: 'id',
-        },
-        inverseJoinColumn: {
-            name: 'case_id',
-            referencedColumnName: 'id',
-        },
-    })
-    cases: Case[];
-}
-
-@Entity()
-export class Case {
-    @PrimaryGeneratedColumn()
-    id: number;
-
-    @Column({ length: 255 })
-    title: string;
-
-    @Column({ type: 'text', nullable: true })
-    description: string;
-
-    @ManyToMany(() => User, (user) => user.cases)
-    users: User[];
+    @OneToMany(() => Case, (caseEntity) => caseEntity.plaintiff)
+    cases?: Case[];
 }

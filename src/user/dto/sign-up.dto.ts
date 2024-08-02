@@ -1,4 +1,5 @@
 import { IsString, MinLength } from 'class-validator';
+import { UserRole } from '../enitity/user.entity';
 
 export class SignUpDto {
   @IsString()
@@ -21,4 +22,6 @@ export class SignUpDto {
 
   @IsString()
   age: string;
+
+  role: UserRole
 }

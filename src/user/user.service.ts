@@ -1,34 +1,44 @@
-import { Injectable, ConflictException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, ConflictException, UnauthorizedException, HttpException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { SignUpDto } from './dto/sign-up.dto';
 import { SignInDto } from './dto/sign-in.dto';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
-import { User } from './enitity/user.entity';
+import { User, UserRole } from './enitity/user.entity';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+import { IServe } from 'src/case/dto/serve.dto';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
-    private jwtService: JwtService
+    private jwtService: JwtService,
   ) {}
 
   async signUp(signUpDto: SignUpDto): Promise<{ accessToken: string }> {
-    const { email, password } = signUpDto;
+    // const { email, password } = signUpDto;
 
-    const userExists = await this.userRepository.findOne({ where: { email } });
+    const userExists = await this.userRepository.findOne({ where: { email: signUpDto.email } });
     if (userExists) {
       throw new ConflictException('Email already exists');
     }
+    const hashedPassword: string = await bcrypt.hash(signUpDto.password, 10);
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = this.userRepository.create({ email, password: hashedPassword });
-    await this.userRepository.save(user);
+    const user = new User()
+    user.fullName = signUpDto.fullName;
+    user.email = signUpDto.email;
+    user.password = hashedPassword;
+    user.phoneNumber = signUpDto.phoneNumber;
+    user.address = signUpDto.address;
+    user.address = signUpDto.gender;
+    user.age = signUpDto.age
+    user.role = UserRole.USER
 
-    const payload = { id: user.id, email };
+    const created = await this.userRepository.save(user);
+
+    const payload = { id: user.id, email: user.email };
     const accessToken = this.jwtService.sign(payload);
     return { accessToken };
   }
@@ -72,4 +82,18 @@ export class UserService {
     const data = await this.userRepository.findOne({where: { id }})
     return data
   }
+
+  async changeRole(email: string, role: UserRole) {
+    const user = await this.userRepository.findOne({ where: { email }});
+    if (!user) {
+      throw new HttpException('User not found', 404)
+    }
+    user.role = role
+    return await this.userRepository.save(user)
+  }
+
+  async acceptServe(signInDto: SignInDto,serveId: string) {
+
+  }
+
 }
