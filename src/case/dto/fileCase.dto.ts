@@ -13,6 +13,10 @@ export class fileCaseDto {
   @IsOptional()
   isApproved?: boolean;
 
+  @IsString()
+  @IsOptional()
+  respondentName: string
+
   @IsEmail()
   respondentEmail: string;
 

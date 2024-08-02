@@ -1,11 +1,10 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CaseModule } from './case/case.module';
 import { UserModule } from './user/user.module';
 import { PassportModule } from '@nestjs/passport';
+import { MailModule } from './mailer/mailer.module';
 
 @Module({
   imports: [
@@ -18,7 +17,8 @@ import { PassportModule } from '@nestjs/passport';
   }),
     CaseModule,
     UserModule,
-    PassportModule
+    PassportModule,
+    MailModule
   ],
 })
 export class AppModule {}

@@ -17,7 +17,7 @@ export class UserService {
     private jwtService: JwtService,
   ) {}
 
-  async signUp(signUpDto: SignUpDto): Promise<{ accessToken: string }> {
+  async signUp(signUpDto: SignUpDto) {
     // const { email, password } = signUpDto;
 
     const userExists = await this.userRepository.findOne({ where: { email: signUpDto.email } });
@@ -40,7 +40,7 @@ export class UserService {
 
     const payload = { id: user.id, email: user.email };
     const accessToken = this.jwtService.sign(payload);
-    return { accessToken };
+    return { accessToken, user: created };
   }
 
   async signIn(signInDto: SignInDto): Promise<{ accessToken: string }> {
@@ -90,10 +90,6 @@ export class UserService {
     }
     user.role = role
     return await this.userRepository.save(user)
-  }
-
-  async acceptServe(signInDto: SignInDto,serveId: string) {
-
   }
 
 }

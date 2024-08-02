@@ -23,5 +23,5 @@ export class SignUpDto {
   @IsString()
   age: string;
 
-  role: UserRole
+  role?: UserRole
 }
